@@ -1,289 +1,204 @@
-# Launch private network
+# Substrate Node Template
 
-full tutorial here
-`https://docs.substrate.io/tutorials/v3/private-network/`
+[![Try on playground](https://img.shields.io/badge/Playground-Node_Template-brightgreen?logo=Parity%20Substrate)](https://docs.substrate.io/playground/) [![Matrix](https://img.shields.io/matrix/substrate-technical:matrix.org)](https://matrix.to/#/#substrate-technical:matrix.org)
 
-  - How to start and stop peer blockchain nodes.
-  - How to generate your own secret key pairs.
-  - How to create a custom chain specification that uses the keys you generated.
-  - How to add validators to a private network that uses your custom chain specification.
+A fresh FRAME-based [Substrate](https://www.substrate.io/) node, ready for hacking :rocket:
 
-Purge old chain data
-```shell
-./target/release/node-template purge-chain --base-path /tmp/node01 --chain local -y
+## Getting Started
+
+Follow the steps below to get started with the Node Template, or get it up and running right from
+your browser in just a few clicks using
+the [Substrate Playground](https://docs.substrate.io/playground/) :hammer_and_wrench:
+
+### Using Nix
+
+Install [nix](https://nixos.org/) and optionally [direnv](https://github.com/direnv/direnv) and
+[lorri](https://github.com/target/lorri) for a fully plug and play experience for setting up the
+development environment. To get all the correct dependencies activate direnv `direnv allow` and
+lorri `lorri shell`.
+
+### Rust Setup
+
+First, complete the [basic Rust setup instructions](./docs/rust-setup.md).
+
+### Run
+
+Use Rust's native `cargo` command to build and launch the template node:
+
+```sh
+cargo run --release -- --dev --tmp
 ```
 
-Start the first node using the custom chain
-```shell
-./target/release/node-template \
---base-path /tmp/alice \
---chain local \
---alice \
---port 30333 \
---ws-port 9945 \
---rpc-port 9933 \
---node-key 0000000000000000000000000000000000000000000000000000000000000001 \
---telemetry-url "wss://telemetry.polkadot.io/submit/ 0" \
---validator
+### Build
+
+The `cargo run` command will perform an initial build. Use the following command to build the node
+without launching it:
+
+```sh
+cargo build --release
 ```
 
-_node-key is for development only_
+### Embedded Docs
 
-### Local node identity
+Once the project has been built, the following command can be used to explore all parameters and
+subcommands:
 
-display when blockchain started
-
-`12D3KooWLmrYDLoNTyTYtRdDyZLWDe1paxzxTw5RgjmHLfzW96SX.`
-
-## add a second validator
-Enable other participants to join
-
-```shell
-./target/release/node-template purge-chain --base-path /tmp/bob --chain local -y
-```
-```shell
-./target/release/node-template \
---base-path /tmp/node02 \
---chain ./customSpecRaw.json \
---port 30334 \
---ws-port 9946 \
---rpc-port 9934 \
---telemetry-url "wss://telemetry.polkadot.io/submit/ 0" \
---validator \
---rpc-methods Unsafe \
---name MyNode02 \
---bootnodes /ip4/127.0.0.1/tcp/30333/p2p/12D3KooWLmrYDLoNTyTYtRdDyZLWDe1paxzxTw5RgjmHLfzW96SX
-```
-change `12D3KooWLmrYDLoNTyTYtRdDyZLWDe1paxzxTw5RgjmHLfzW96SX`
-to Local node identity
-
-check apps to see it work
-
-### Generate your own keys
-
-in project root
-```shell
-./target/release/node-template key generate --scheme Sr25519 --password-interactive
-```
-copy the output
-```
-  Secret phrase:     turkey public want access hospital decide inhale tent accuse ranch shrimp effort
-  Secret seed:       0x1c19a20ea6c5319f10eef9d3c567762ed51c0321121f4414e6db42461664d485
-  Public key (hex):  0x4cf828a13b637e3517b6195418cf21a3017cf59e6874dbbdb9e138cffded571c
-  Account ID:        0x4cf828a13b637e3517b6195418cf21a3017cf59e6874dbbdb9e138cffded571c
-  Public key (SS58): 5DodDRHfjWeJDjSSXmWhaemGLscT6omuN6R4SAkowACVtdBd
-  SS58 Address:      5DodDRHfjWeJDjSSXmWhaemGLscT6omuN6R4SAkowACVtdBd
+```sh
+./target/release/node-template -h
 ```
 
-add secret seed key to node
-```shell
-./target/release/node-template key inspect --password-interactive --scheme Ed25519 0x1c19a20ea6c5319f10eef9d3c567762ed51c0321121f4414e6db42461664d485
-```
-get output and save public key
+## Run
 
-```
-  Secret Key URI     `0x1c19a20ea6c5319f10eef9d3c567762ed51c0321121f4414e6db42461664d485` is account:
-  Secret seed:       0x1c19a20ea6c5319f10eef9d3c567762ed51c0321121f4414e6db42461664d485
-  Public key (hex):  0x5cfa01bedf81b06fb925123548f6047820d3906e261be65aeabe01eaf548ff13
-  Account ID:        0x5cfa01bedf81b06fb925123548f6047820d3906e261be65aeabe01eaf548ff13
-  Public key (SS58): 5EAcXhUp48d2FtnkdKLcc2GVvsWaYA53jCSmKDE2UNiKH6dP
-  SS58 Address:      5EAcXhUp48d2FtnkdKLcc2GVvsWaYA53jCSmKDE2UNiKH6dP
-```
+The provided `cargo run` command will launch a temporary node and its state will be discarded after
+you terminate the process. After the project has been built, there are other ways to launch the
+node.
 
-generate second key
+### Single-Node Development Chain
 
-```
-  Secret phrase:       analyst shoot clay dust such toy scout pool filter give throw crack
-  Secret seed:       0x403e4e7a0ecc4c3033683cdfa2406e2552c0ab04ddf5b458371c5e568d5d6673
-  Public key (hex):  0xd0c5500c6d7edac71a65240ad2553f0c678db64ee4f7902c5c46b7196f383b09
-  Account ID:        0xd0c5500c6d7edac71a65240ad2553f0c678db64ee4f7902c5c46b7196f383b09
-  Public key (SS58): 5GnSRy7hFf5Gjs14kjttcPWnFierK59JnbPNiFTzBxnuivL7
-  SS58 Address:      5GnSRy7hFf5Gjs14kjttcPWnFierK59JnbPNiFTzBxnuivL7
+This command will start the single-node development chain with persistent state:
+
+```bash
+./target/release/node-template --dev
 ```
 
-```
-  Secret Key URI `0x403e4e7a0ecc4c3033683cdfa2406e2552c0ab04ddf5b458371c5e568d5d6673` is account:
-  Secret seed:       0x403e4e7a0ecc4c3033683cdfa2406e2552c0ab04ddf5b458371c5e568d5d6673
-  Public key (hex):  0x8a4decdab5c034b15f4a854b97ce9ae6d72540b99f961608191583c77939f372
-  Account ID:        0x8a4decdab5c034b15f4a854b97ce9ae6d72540b99f961608191583c77939f372
-  Public key (SS58): 5FC3cZKd8qr7njsNGzsfVReCgyp8LUekKTLJ2VNJV9PHLLBn
-  SS58 Address:      5FC3cZKd8qr7njsNGzsfVReCgyp8LUekKTLJ2VNJV9PHLLBn
+Purge the development chain's state:
+
+```bash
+./target/release/node-template purge-chain --dev
 ```
 
-## Modify an existing chain specification
+Start the development chain with detailed logging:
 
-```shell
-./target/release/node-template build-spec --disable-default-bootnode --chain local > customSpec.json
+```bash
+RUST_BACKTRACE=1 ./target/release/node-template -ldebug --dev
 ```
 
-## Modify an existing chain specification
+### Connect with Polkadot-JS Apps Front-end
 
-create customSpec.json
-```shell
-./target/release/node-template build-spec --disable-default-bootnode --chain local > customSpec.json
-```
+Once the node template is running locally, you can connect it with **Polkadot-JS Apps** front-end
+to interact with your chain. [Click
+here](https://polkadot.js.org/apps/#/explorer?rpc=ws://localhost:9944) connecting the Apps to your
+local node template.
 
-set detailed
-```json
-{
-  "name": "My Custom Testnet",
-  "aura": {
-    "authorities": [
-      "5CfBuoHDvZ4fd8jkLQicNL8tgjnK8pVG9AiuJrsNrRAx6CNW",
-      "5EJPj83tJuJtTVE2v7B9ehfM7jNT44CBFaPWicvBwYyUKBS6"
-    ]
-  },
-  "grandpa": {
-    "authorities": [
-      [
-        "5CuqCGfwqhjGzSqz5mnq36tMe651mU9Ji8xQ4JRuUTvPcjVN",
-        1
-      ],
-      [
-        "5FeJQsfmbbJLTH1pvehBxrZrT5kHvJFj84ZaY5LK7NU87gZS",
-        1
-      ]
-    ]
-  },
-}
-```
+### Multi-Node Local Testnet
 
-### Convert the chain specification to use the raw format
+If you want to see the multi-node consensus algorithm in action, refer to our
+[Start a Private Network tutorial](https://docs.substrate.io/tutorials/v3/private-network).
+
+## Template Structure
+
+A Substrate project such as this consists of a number of components that are spread across a few
+directories.
+
+### Node
+
+A blockchain node is an application that allows users to participate in a blockchain network.
+Substrate-based blockchain nodes expose a number of capabilities:
+
+- Networking: Substrate nodes use the [`libp2p`](https://libp2p.io/) networking stack to allow the
+  nodes in the network to communicate with one another.
+- Consensus: Blockchains must have a way to come to
+  [consensus](https://docs.substrate.io/v3/advanced/consensus) on the state of the
+  network. Substrate makes it possible to supply custom consensus engines and also ships with
+  several consensus mechanisms that have been built on top of
+  [Web3 Foundation research](https://research.web3.foundation/en/latest/polkadot/NPoS/index.html).
+- RPC Server: A remote procedure call (RPC) server is used to interact with Substrate nodes.
+
+There are several files in the `node` directory - take special note of the following:
+
+- [`chain_spec.rs`](./node/src/chain_spec.rs): A
+  [chain specification](https://docs.substrate.io/v3/runtime/chain-specs) is a
+  source code file that defines a Substrate chain's initial (genesis) state. Chain specifications
+  are useful for development and testing, and critical when architecting the launch of a
+  production chain. Take note of the `development_config` and `testnet_genesis` functions, which
+  are used to define the genesis state for the local development chain configuration. These
+  functions identify some
+  [well-known accounts](https://docs.substrate.io/v3/tools/subkey#well-known-keys)
+  and use them to configure the blockchain's initial state.
+- [`service.rs`](./node/src/service.rs): This file defines the node implementation. Take note of
+  the libraries that this file imports and the names of the functions it invokes. In particular,
+  there are references to consensus-related topics, such as the
+  [longest chain rule](https://docs.substrate.io/v3/advanced/consensus#longest-chain-rule),
+  the [Aura](https://docs.substrate.io/v3/advanced/consensus#aura) block authoring
+  mechanism and the
+  [GRANDPA](https://docs.substrate.io/v3/advanced/consensus#grandpa) finality
+  gadget.
+
+After the node has been [built](#build), refer to the embedded documentation to learn more about the
+capabilities and configuration parameters that it exposes:
 
 ```shell
-./target/release/node-template build-spec --chain=customSpec.json --raw --disable-default-bootnode > customSpecRaw.json
+./target/release/node-template --help
 ```
 
-## Start both node
+### Runtime
 
-```shell
-./target/release/node-template \
---base-path /tmp/node01 \
---chain ./customSpecRaw.json \
---port 30333 \
---ws-port 9944 \
---rpc-port 9933 \
---telemetry-url "wss://telemetry.polkadot.io/submit/ 0" \
---validator \
---rpc-methods Unsafe \
---name MyNode01
+In Substrate, the terms
+"[runtime](https://docs.substrate.io/v3/getting-started/glossary#runtime)" and
+"[state transition function](https://docs.substrate.io/v3/getting-started/glossary#state-transition-function-stf)"
+are analogous - they refer to the core logic of the blockchain that is responsible for validating
+blocks and executing the state changes they define. The Substrate project in this repository uses
+the [FRAME](https://docs.substrate.io/v3/runtime/frame) framework to construct a
+blockchain runtime. FRAME allows runtime developers to declare domain-specific logic in modules
+called "pallets". At the heart of FRAME is a helpful
+[macro language](https://docs.substrate.io/v3/runtime/macros) that makes it easy to
+create pallets and flexibly compose them to create blockchains that can address
+[a variety of needs](https://www.substrate.io/substrate-users/).
 
-./target/release/node-template \
---base-path /tmp/node02 \
---chain ./customSpecRaw.json \
---port 30334 \
---ws-port 9945 \
---rpc-port 9935 \
---telemetry-url "wss://telemetry.polkadot.io/submit/ 0" \
---validator \
---rpc-methods Unsafe \
---name MyNode02
+Review the [FRAME runtime implementation](./runtime/src/lib.rs) included in this template and note
+the following:
+
+- This file configures several pallets to include in the runtime. Each pallet configuration is
+  defined by a code block that begins with `impl $PALLET_NAME::Config for Runtime`.
+- The pallets are composed into a single runtime by way of the
+  [`construct_runtime!`](https://crates.parity.io/frame_support/macro.construct_runtime.html)
+  macro, which is part of the core
+  [FRAME Support](https://docs.substrate.io/v3/runtime/frame#support-crate)
+  library.
+
+### Pallets
+
+The runtime in this project is constructed using many FRAME pallets that ship with the
+[core Substrate repository](https://github.com/paritytech/substrate/tree/master/frame) and a
+template pallet that is [defined in the `pallets`](./pallets/template/src/lib.rs) directory.
+
+A FRAME pallet is compromised of a number of blockchain primitives:
+
+- Storage: FRAME defines a rich set of powerful
+  [storage abstractions](https://docs.substrate.io/v3/runtime/storage) that makes
+  it easy to use Substrate's efficient key-value database to manage the evolving state of a
+  blockchain.
+- Dispatchables: FRAME pallets define special types of functions that can be invoked (dispatched)
+  from outside of the runtime in order to update its state.
+- Events: Substrate uses [events and errors](https://docs.substrate.io/v3/runtime/events-and-errors)
+  to notify users of important changes in the runtime.
+- Errors: When a dispatchable fails, it returns an error.
+- Config: The `Config` configuration interface is used to define the types and parameters upon
+  which a FRAME pallet depends.
+
+### Run in Docker
+
+First, install [Docker](https://docs.docker.com/get-docker/) and
+[Docker Compose](https://docs.docker.com/compose/install/).
+
+Then run the following command to start a single node development chain.
+
+```bash
+./scripts/docker_run.sh
 ```
 
-## Launch the private network
+This command will firstly compile your code, and then start a local development network. You can
+also replace the default command
+(`cargo build --release && ./target/release/node-template --dev --ws-external`)
+by appending your own. A few useful ones are as follow.
 
-1. You have generated or collected the account keys for at least two authority accounts.
-2. You have updated your custom chain specification to include the keys for block production (aura) and block finalization (grandpa).
-3. You have converted your custom chain specification to raw format and distributed the raw chain specification to the nodes participating in the private network.
+```bash
+# Run Substrate node without re-compiling
+./scripts/docker_run.sh ./target/release/node-template --dev --ws-external
 
-## Add keys to the keystore
+# Purge the local dev chain
+./scripts/docker_run.sh ./target/release/node-template purge-chain --dev
 
-After you start the first node, no blocks are yet produced. The next step is to add two types of keys to the keystore for each node in the network.
-
-secret-seed from aura key
-```shell
-./target/release/node-template key insert --base-path /tmp/node01 \
---chain customSpecRaw.json \
---suri <your-secret-seed> \
---password-interactive \
---key-type aura \
---scheme Sr25519
+# Check whether the code is compilable
+./scripts/docker_run.sh cargo check
 ```
-`0x1c19a20ea6c5319f10eef9d3c567762ed51c0321121f4414e6db42461664d485`
-
-can also add from file
-```shell
-./target/release/node-template key insert --help
-```
-
-secret-seed from grandpa key
-```shell
-./target/release/node-template key insert --base-path /tmp/node01 \
---chain customSpecRaw.json \
---suri <your-secret-key> \
---password-interactive \
---key-type gran \
---scheme Ed25519
-```
-`0x1c19a20ea6c5319f10eef9d3c567762ed51c0321121f4414e6db42461664d485`
-
-### verify key set
-
-remember change folder directory
-```shell
-ls /tmp/node01/chains/ong_testnet/keystore
-```
-
-### rejoin network
-
-```shell
-./target/release/node-template \
---base-path /tmp/node01 \
---chain ./customSpecRaw.json \
---port 30333 \
---ws-port 9945 \
---rpc-port 9933 \
---telemetry-url "wss://telemetry.polkadot.io/submit/ 0" \
---validator \
---rpc-methods Unsafe \
---name MyNode01
-
-./target/release/node-template \
---base-path /tmp/node02 \
---chain ./customSpecRaw.json \
---port 30334 \
---ws-port 9946 \
---rpc-port 9934 \
---telemetry-url "wss://telemetry.polkadot.io/submit/ 0" \
---validator \
---rpc-methods Unsafe \
---name MyNode02 \
---bootnodes /ip4/127.0.0.1/tcp/30333/p2p/12D3KooWF9XqqboRLkfai8JpmvWTnoRVWjvrwZUMwE6cu99JaYfX
-```
-replace the node identity to node01
-`12D3KooWF9XqqboRLkfai8JpmvWTnoRVWjvrwZUMwE6cu99JaYfX`
-
-bootnode need to be valid
-
-# Host own Polkadot-JS Explorer
-
-if not work use
-`https://polkadot.js.org/apps/`
-
-`https://github.com/polkadot-js/apps#development`
-
-git clone then install
-```shell
-$ git clone https://github.com/polkadot-js/apps <optional local path>
-$ yarn
-```
-
-or run docker container
-
-_remember to use host network_
-```shell
-$ docker run --rm -it --name polkadot-ui -e WS_URL=ws://0.0.0.0:9945 -p 80:80 --network host jacogr/polkadot-js-apps:latest
-```
-
-if build explorer for local change
-```shell
-$ docker build -t jacogr/polkadot-js-apps .
-```
-
-### custom endpoints for polkadot js explorer
-
-set development local node
-
-
-
-
